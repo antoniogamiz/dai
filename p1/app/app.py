@@ -1,4 +1,3 @@
-import time
 import math
 import re
 from flask import Flask
@@ -7,77 +6,70 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'P1 - Antonio Gamiz Delgado'
+    return 'Elena Merelo Moline - Práctica 1'
 
 
-# ejercicio 2
 @app.route('/ordenar/<numeros>')
 def ordenar(numeros):
     numeros = numeros.split(",")
+    ordenados = sorted(numeros)
+    return {'resultado': ordenados}
 
-    start_time = time.perf_counter()
-    numeros.sort()
-    end_time = time.perf_counter()
 
+@app.route('/primos/<int:n>')
+def primos(n):
+    primos = [True for i in range(n + 1)]
+    p = 2
+    while (p * p <= n):
+        if (primos[p] == True):
+            for i in range(p ** 2, n + 1, p):
+                primos[i] = False
+        p += 1
+    primos[0] = False
+    primos[1] = False
+    resultado = [p for p in range(n+1) if primos[p]]
+    return {'primos': resultado}
+
+
+@app.route('/secuencia_fibonacci/<int:n>')
+def secuencia_fibonacci(n):
+    a, b = 1, 1
+    if n <= 2:
+        return {'n': a}
+    for i in range(n-2):
+        tmp = a
+        a = b
+        b = tmp + b
     return {
-        'sorted': numeros,
-        'time': end_time-start_time
+        'n': b
     }
 
 
-# ejercicio 3
-@app.route('/erastotenes/<int:n>')
-def erastotenes(n):
-    marcas = [0] * n
-    for i in range(2, math.floor(math.sqrt(n))+1):
-        if not marcas[i-1]:
-            for j in range(i, n // i + 1):
-                app.logger.info(f'{i}-{j}')
-                marcas[i*j - 1] = 1
-    resultado = [i+1 for i, x in enumerate(marcas) if x == 0 and i != 0]
-    return {'resultado': resultado}
-
-
-# ejercicio 4
-@app.route('/fibonacci/<int:n>')
-def fibonacci(n):
-    phi = (1+math.sqrt(5))/2
-    n_plus_1 = (pow(phi, n) - pow(1-phi, n)) / math.sqrt(5)
-    return {
-        'resultado': int(n_plus_1)
-    }
-
-
-# ejercicio 5
-@app.route('/corchetes/<corchetes>')
+@app.route('/validar_corchetes/<corchetes>')
 def corchetes(corchetes):
     contador = 0
     for c in corchetes:
         if c == '[':
             contador += 1
-        else:
-            contador -= 1
-
-        if contador < 0:
-            return {'resultado': 'Invalido'}
+            continue
+        contador -= 1
 
     if contador != 0:
         return {'resultado': 'Invalido'}
     return {'resultado': 'Valido'}
 
 
-# ejercicio 6
-@app.route('/regulares/<texto>')
-def regulares(texto):
+@app.route('/identificar/<texto>')
+def identificar(texto):
     if re.match('[A-Z]\w+ [A-Z]', texto):
-        return {'resultado': 'Palabra detectada'}
+        return 'Palabra detectada'
     if re.match("^.+@.+\..+$", texto):
-        return {'resultado': 'Es un correo electronico'}
+        return 'Correo electronico'
     if re.match("^(\d{4}[- ]?){4}$", texto):
-        return {'resultado': 'Es una tarjeta de credito'}
-    return {'resultado': 'El texto introducido no es ni una palabra en mayuscula seguida de mayuscula, ni un email ni una tarjeta de credito.'}
+        return 'Tarjeta de credito'
+    return 'No se ha encontrado nada'
 
 
 @app.errorhandler(404)
 def own_404_page(error):
-    return 'KERNEL PANIC - PAGINA NO ENCONTRADA!!!'
+    return '404 - Not found'
