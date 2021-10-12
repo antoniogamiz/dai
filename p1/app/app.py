@@ -1,13 +1,14 @@
 import time
 import math
 import re
-from flask import Flask
+from flask import Flask, render_template
+
 app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    return 'P1 - Antonio Gamiz Delgado'
+def root():
+    return render_template('index.html')
 
 
 # ejercicio 2
