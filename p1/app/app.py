@@ -2,15 +2,17 @@ import time
 import math
 import re
 from .model import User
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect
 from .controllers import get_user_data_from_request
 
+
 app = Flask(__name__)
+app.secret_key = 'esto-es-una-clave-muy-secreta'
 
 
 @app.route('/')
 def root():
-    return render_template('index.html')
+    return render_home_page()
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -20,9 +22,14 @@ def show_signup_form():
 
     username, password, remember_me = get_user_data_from_request()
 
+    if 'logeado' in session:
+        return redirect("/")
+
     try:
         user = User(username, password)
         user.crear()
+        session['logeado'] = True
+
     except Exception as exception:
         return render_template("login.html", action='/signup', error=str(exception))
 
@@ -36,12 +43,22 @@ def show_login_form():
 
     username, password, remember_me = get_user_data_from_request()
 
+    if 'logeado' in session:
+        return redirect("/")
+
     try:
         user = User(username, password)
         user.validar_clave()
+        session['logeado'] = True
     except Exception as exception:
         return render_template("login.html", action='/login', error=str(exception))
     return render_template('index.html', title='Bienvenido!')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('logeado', None)
+    return redirect("/")
 
 
 # ejercicio 2
@@ -114,3 +131,9 @@ def regulares(texto):
 @app.errorhandler(404)
 def own_404_page(error):
     return 'KERNEL PANIC - PAGINA NO ENCONTRADA!!!'
+
+
+def render_home_page(title='Lore ipsum'):
+    if 'logeado' in session:
+        return render_template('index.html', title=title, logeado=True)
+    return render_template('index.html', title='Lore ipsum', logeado=False)
