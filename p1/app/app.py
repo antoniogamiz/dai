@@ -1,7 +1,9 @@
 import time
 import math
 import re
-from flask import Flask, render_template
+from .model import User
+from flask import Flask, render_template, request
+from .controllers import get_user_data_from_request
 
 app = Flask(__name__)
 
@@ -9,6 +11,37 @@ app = Flask(__name__)
 @app.route('/')
 def root():
     return render_template('index.html')
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def show_signup_form():
+    if request.method == 'GET':
+        return render_template("login.html", action='/signup')
+
+    username, password, remember_me = get_user_data_from_request()
+
+    try:
+        user = User(username, password)
+        user.crear()
+    except Exception as exception:
+        return render_template("login.html", action='/signup', error=str(exception))
+
+    return render_template('index.html', title='Registrado!')
+
+
+@app.route("/login", methods=["GET", "POST"])
+def show_login_form():
+    if request.method == 'GET':
+        return render_template("login.html", action='/login')
+
+    username, password, remember_me = get_user_data_from_request()
+
+    try:
+        user = User(username, password)
+        user.validar_clave()
+    except Exception as exception:
+        return render_template("login.html", action='/login', error=str(exception))
+    return render_template('index.html', title='Bienvenido!')
 
 
 # ejercicio 2
@@ -33,7 +66,6 @@ def erastotenes(n):
     for i in range(2, math.floor(math.sqrt(n))+1):
         if not marcas[i-1]:
             for j in range(i, n // i + 1):
-                app.logger.info(f'{i}-{j}')
                 marcas[i*j - 1] = 1
     resultado = [i+1 for i, x in enumerate(marcas) if x == 0 and i != 0]
     return {'resultado': resultado}
