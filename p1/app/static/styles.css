@@ -1,0 +1,22 @@
+.debug {
+  border: 1px solid red;
+  height: 85vh;
+}
+
+body {
+  background-image: url("/static/img/bg.png");
+  background-repeat: repeat;
+}
+
+.nav-bar {
+  background-color: black;
+}
+
+.nav-bar .nav-link {
+  color: orange !important;
+}
+
+.footer {
+  color: orange !important;
+  background: black;
+}
