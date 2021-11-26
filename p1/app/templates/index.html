@@ -1,4 +1,19 @@
 {% extends "layout.html" %}
 {% block body %}
 <h1>{{ title}}</h1>
+
+<a href="/pokemon">Pokemon</a>
+
+<h3>Restful API</h3>
+
+<p>curl -X POST http://localhost:5000/pokemon -H 'Content-Type: application/json' -d '{"name": "hola", "img": "fe"}'</p>
+
+<p>curl -X GET http://localhost:5000/pokemon</p>
+
+<p>curl -X GET http://localhost:5000/pokemon/58f56171ee9d4bd5e610d6da</p>
+
+<p>curl -X DELETE http://localhost:5000/pokemon/61a0fd888b2c577db610819c</p>
+
+<p>curl -X PATCH http://localhost:5000/pokemon/58f56171ee9d4bd5e610d6d8 -H 'Content-Type: application/json' -d '{"img":
+    ":D"}'</p>
 {% endblock %}

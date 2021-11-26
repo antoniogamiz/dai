@@ -1,18 +1,29 @@
 import time
 import math
 import re
-from .model import User
+from .model import User, Pokemon
 from flask import Flask, render_template, request, session, redirect
+from flask_restful import Resource, Api
 from .controllers import get_user_data_from_request
-
+from .views import PokemonView
 
 app = Flask(__name__)
+api = Api(app)
 app.secret_key = 'esto-es-una-clave-muy-secreta'
+api.add_resource(PokemonView, '/pokemon', '/pokemon/<id>')
 
 
 @app.route('/')
 def root():
     return render_home_page()
+
+
+@app.route('/pokemon_catalog', methods=["GET", "POST"])
+def pokemon():
+    pokemon_model = Pokemon()
+    name = request.form.get('pokemon_name', None)
+    pokemons = pokemon_model.get(name)
+    return render_template('pokemon.html', name=name or '', pokemons=pokemons, title='Pokemon', logeado='logeado' in session)
 
 
 @app.route("/signup", methods=["GET", "POST"])

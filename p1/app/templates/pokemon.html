@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Pokedex</h1>
+<div class="container">
+    <form action="{{ action }}" method="POST">
+        <div class="form-group m-4">
+            <label for="email">Name:</label>
+            <input name="pokemon_name" class="form-control" id="pokemon_name" value="{{name}}">
+        </div>
+        <button type="submit" class="btn btn-primary ms-4">Submit</button>
+    </form>
+    <ul class="list-group p-4">
+        {%for pokemon in pokemons%}
+        <li class="list-group-item">
+            <div class="pokemon">
+                <img src="{{pokemon['img']}}" alt="">
+                <span>{{pokemon['name']}}</span>
+            </div>
+        </li>
+        {%endfor%}
+    </ul>
+
+</div>
+{% endblock %}

@@ -1,2 +1,4 @@
 flask==2.0
 pickleshare
+pymongo
+flask_restful
