@@ -1,0 +1,23 @@
+{% extends "estructura.html" %}
+{% block body %}
+<h1>Buscador socios</h1>
+<div class="container">
+    <form action="/buscador_socios" method="POST">
+        <div class="form-group m-4">
+            <label for="nombre_socio">Nombre socio:</label>
+            <input name="nombre_socio" class="form-control" id="nombre_socio" value="{{nombre_socio}}">
+        </div>
+        <button type="submit" class="btn btn-primary ms-4">Buscar</button>
+    </form>
+    <ul class="list-group p-4">
+        {%for socio in socios%}
+        <li class="list-group-item">
+            <span><b>Nombre: </b>{{socio['FirstName']}}</span><br>
+            <span><b>Apellido: </b>{{socio['LastName']}}</span><br>
+            <span><b>Teléfono: </b>{{socio['phone']}}</span><br>
+            <span><b>Dirección: </b>{{socio['address']}}</span><br>
+        </li>
+        {%endfor%}
+    </ul>
+</div>
+{% endblock %}

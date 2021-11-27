@@ -1,7 +1,8 @@
-from .modelos import ModeloUsuario
+from .modelos import ModeloUsuario, SociosPlantas
 import math
 import re
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, jsonify
+
 app = Flask(__name__)
 app.secret_key = 'STRING SUPER SECRETO'
 
@@ -57,7 +58,7 @@ def registrar_usuario():
     except Exception as exception:
         return render_template("login.html", action='/registrarse', error=str(exception))
 
-    return render_template('principal.html', titulo='Ya eres miembro de Planta Elena! Hora de comprar :D!')
+    return render_template('principal.html', titulo='Ya eres miembro de Planta Elena! Hora de comprar :D!', usuario_esta_logeado=True)
 
 
 @app.route("/iniciarsesion", methods=["GET", "POST"])
@@ -159,3 +160,78 @@ def identificar(texto):
 @app.errorhandler(404)
 def own_404_page(error):
     return '404 - Not found'
+
+
+# P3 -------- aqui empieza la P3 ------------
+
+def conseguir_termino_de_busqueda():
+    return request.form.get('nombre_socio', None)
+
+
+@app.route("/buscador_socios", methods=["GET", "POST"])
+def mostrar_pagina_busqueda_socios():
+    nombre_socio_busqueda = conseguir_termino_de_busqueda()
+    socios = SociosPlantas.todos_los_socios(nombre_socio_busqueda)
+    return render_template('buscador_socios.html', socios=socios, titulo=TITULO_LOGEADO, usuario_esta_logeado='usuario_esta_logeado' in session)
+
+
+# P3 - API
+
+
+@app.route("/api/socios", methods=["GET"])
+def api_get_todos_los_socios():
+    socios = SociosPlantas.todos_los_socios()
+    return jsonify(socios)
+
+
+@app.route("/api/socios/<int:id>", methods=["GET"])
+def api_get_un_socio(id):
+    socio = SociosPlantas.buscar_socio_por_id(id)
+    socio_no_existe = socio is None
+    if socio_no_existe:
+        return {'error': 'Socio no encontrado. ¿Es correcto el id?'}, 404
+    return socio
+
+
+@app.route("/api/socios", methods=["POST"])
+def api_post():
+    try:
+        nuevo_socio = {
+            'FirstName': request.json.get('FirstName'),
+            'LastName': request.json.get('LastName'),
+            'phone': request.json.get('phone'),
+            'address': request.json.get('address'),
+        }
+        SociosPlantas.crear_socio(nuevo_socio)
+        return {"mensaje": "Socio creado correctamente"}, 200
+    except Exception as exception:
+        return {"error": str(exception)}, 500
+
+
+@app.route("/api/socios/<int:id>", methods=["PATCH"])
+def api_patch(id):
+    if id is None:
+        return {'error': 'El id del socio es necesario para actualizarlo'}, 400
+    nuevo_socio = {}
+    if request.json.get('FirstName', None) is not None:
+        nuevo_socio['FirstName'] = request.json.get('FirstName')
+    if request.json.get('LastName', None) is not None:
+        nuevo_socio['LastName'] = request.json.get('LastName')
+    if request.json.get('phone', None) is not None:
+        nuevo_socio['phone'] = request.json.get('phone')
+    if request.json.get('address', None) is not None:
+        nuevo_socio['address'] = request.json.get('address')
+
+    estado = SociosPlantas.actualizar_socio(id, nuevo_socio)
+    if estado is None:
+        return {'error': 'No existe ningun socio con ese id'}, 404
+
+    return {"mensaje": "Socio actualizado correctamente"}, 200
+
+
+@app.route("/api/socios/<int:id>", methods=["DELETE"])
+def api_delete(id):
+    if id is None:
+        return {'mensaje': 'El id es necesario para borrar un cliente'}, 400
+    r = SociosPlantas.borrar_socio(id)
+    return {'mensaje': f'{r}El socio ha sido borrado correctmente'}
