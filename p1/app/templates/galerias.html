@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<script>
+    function borrarGaleria(event, id) {
+        event.stopPropagation();
+        fetch(`/${id}`, { method: 'DELETE', headers: { "X-CSRFToken": token } }).then(() => document.location.reload(true));
+    }
+
+    function verCuadrosGaleria(event, id) {
+        event.stopPropagation();
+        window.location.href = `/cuadros/${id}`;
+    }
+
+    function actualizarGaleria(event, id) {
+        event.stopPropagation();
+        window.location.href = `/actualizar_galeria/${id}`;
+    }
+</script>
+
+{% for galeria in galerias %}
+<ul class="list-group">
+    <li onclick="verCuadrosGaleria(event, '{{galeria.id}}')"
+        class="list-group-item d-flex justify-content-between mb-2">
+        <p><b>{{galeria.nombre}}</b>: {{galeria.direccion}}</p>
+        <div class="d-flex justify-content-between">
+            <i class="bi bi-x m-2" onclick="borrarGaleria(event, '{{galeria.id}}')"></i>
+            <i class="bi bi-pen m-2" onclick="actualizarGaleria(event, '{{galeria.id}}')"></i>
+        </div>
+    </li>
+</ul>
+{% endfor %}
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <button onclick="window.location.href='/crear_galeria'" class="btn btn-default mt-4" type="submit">Crear
+                nueva
+                galeria
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<script>
+    function borrarCuadro(event, id) {
+        event.stopPropagation();
+        fetch(`/cuadros/{{galeria.id}}/${id}`, { method: 'DELETE', headers: { "X-CSRFToken": token } }).then(() => document.location.reload(true));
+    }
+
+    function actualizarCuadro(event, galeria_id, id) {
+        event.stopPropagation();
+        window.location.href = `/cuadros/${galeria_id}/actualizar_cuadro/${id}`;
+    }
+</script>
+
+<p class="text-center">Nombre Galería: {{galeria.nombre}}</p>
+
+
+{% for cuadro in cuadros %}
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between mb-2">
+        <p><b>{{cuadro.nombre}}</b>: {{cuadro.autor}}</p>
+        <div class="d-flex justify-content-between">
+            <i class="bi bi-x m-2" onclick="borrarCuadro(event, '{{cuadro.id}}')"></i>
+            <i class="bi bi-pen m-2" onclick="actualizarCuadro(event, '{{galeria.id}}', '{{cuadro.id}}')"></i>
+        </div>
+    </li>
+</ul>
+{% endfor %}
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <button onclick="window.location.href='/cuadros/{{galeria.id}}/crear_cuadro'" class="btn btn-default mt-4"
+                type="submit">Añadir
+                cuadro
+            </button>
+            <button onclick="window.location.href='/'; return false" class="btn btn-default  mt-4">Ver galerías</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

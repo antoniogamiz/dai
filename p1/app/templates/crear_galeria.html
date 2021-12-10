@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <button class="btn btn-default" type="submit">{% if actualizar%} Actualizar {% else %} Crear {% endif %}
+                    galería</button>
+            </div>
+            <div class="col text-center">
+                <button onclick="window.location.href='/'; return false" class="btn btn-default">Ver galerías</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
